@@ -1,6 +1,18 @@
 # lightcm
 A lightweight contextmenu for the web.
 
+![Screenshot](screenshots/screenshot.png)
+
+## Install
+
+```
+$ npm install lightcm
+```
+
+or
+
+[Download here](dist.zip)
+
 ## Quick Start
 ```javascript
 LightCM.init([
