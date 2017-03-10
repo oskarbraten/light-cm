@@ -11,7 +11,7 @@ $ npm install lightcm
 
 or
 
-[Download here](https://github.com/oskarbraten/lightcm/releases/download/1.0.0/dist.zip)
+[Download here](https://github.com/oskarbraten/lightcm/releases/download/1.0.1/dist.zip)
 
 ## Quick Start
 ```javascript
