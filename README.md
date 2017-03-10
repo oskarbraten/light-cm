@@ -35,7 +35,7 @@ LightCM.init([
 An item can have 3 properties:
  * `label` : \<String\>
  * `attributes` : \<Object\>
- * [`handler`](### handler(data, event, clickEvent)) : \<Function\>
+ * [`handler`](#handlerdata-event-clickEvent)) : \<Function\>
 
 `attributes` can contain any valid anchor-tag attribute (href, target, style, id, class etc..). And can be defined using a `String` or `Function` => `String`.
 
@@ -85,7 +85,7 @@ LightCM.open(event, { url: '/hello' });
 
 ### handler(data, event, clickEvent)
 #### Parameters:
- * [`data`](###data) : \<Object\>
+ * [`data`](#data) : \<Object\>
  * `event` : \<[ContextMenuEvent](https://developer.mozilla.org/en-US/docs/Web/Events/contextmenu)\>
  * `clickEvent` : \<[ClickEvent](https://developer.mozilla.org/en/docs/Web/Events/click)\>
 
