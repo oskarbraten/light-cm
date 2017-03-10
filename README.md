@@ -35,7 +35,7 @@ LightCM.init([
 An item can have 3 properties:
  * `label` : \<String\>
  * `attributes` : \<Object\>
- * [`handler`](#handlerdata-event-clickEvent)) : \<Function\>
+ * [`handler`](#handlerdata-event-clickevent) : \<Function\>
 
 `attributes` can contain any valid anchor-tag attribute (href, target, style, id, class etc..). And can be defined using a `String` or `Function` => `String`.
 
