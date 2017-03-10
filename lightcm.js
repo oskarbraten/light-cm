@@ -8,9 +8,16 @@
 
     'use strict';
 
-    function render(str, data) => {
+    function isFunction (object) {
+        return typeof object === 'function';
+    }
+
+    function render(str, data) {
         return str.replace(/{{\s*([\w]+)\s*}}/g, function (a, b) {
             let r = data[b];
+            if (isFunction(r)) {
+                r = r();
+            }
             return typeof r === 'string' || typeof r === 'number' ? r : a;
         });
     };
@@ -29,7 +36,7 @@
 
         // remove old context menu element.
         let _oldElement = document.getElementById('context-menu');
-        if (_oldElement !== undefined) {
+        if (_oldElement) {
             _oldElement.remove();
         }
 
@@ -42,14 +49,12 @@
             button.classList.add('btn');
             button.textContent = item.label;
 
-            if (item.id) {
-                button.setAttribute('id', item.id);
-            }
-            if (item.href) {
-                button.setAttribute('href', item.href);
-            }
-            if (item.target) {
-                button.setAttribute('target', item.target);
+            for (let attribute in item.attributes) {
+                let attributeValue = item.attributes[attribute];
+                if (isFunction(attributeValue)) {
+                    attributeValue = attributeValue();
+                }
+                button.setAttribute(attribute, attributeValue);
             }
 
             item.element = button;
@@ -73,25 +78,18 @@
             for (let item of this.items) {
                 item.element.textContent = render(item.label, data);
 
-                if (item.id) {
-                    item.element.setAttribute('id', render(item.id, data));
-                }
-                if (item.href) {
-                    item.element.setAttribute('href', render(item.href, data));
-                }
-                if (item.target) {
-                    item.element.setAttribute('target', render(item.target, data));
-                }
-                if (item.handler) {
-
-                    function handler(clickEvent) {
-                        item.handler(data, clickEvent, event);
-
-                        clickEvent.target.removeEventListener('click', handler);
+                for (let attribute in item.attributes) {
+                    let attributeValue = item.attributes[attribute];
+                    if (isFunction(attributeValue)) {
+                        attributeValue = attributeValue();
                     }
+                    item.element.setAttribute(attribute, render(attributeValue));
+                }
 
-                    item.element.addEventListener('click', handler);
-
+                if (item.handler) {
+                    item.element.onclick = (clickEvent) => {
+                        item.handler(data, event, clickEvent);
+                    }
                 }
             }
         }
@@ -100,9 +98,14 @@
         this.element.style.left = event.pageX + 'px';
         this.element.style.display = 'flex';
 
-        window.addEventListener('click', () => {
-            this.element.style.display = 'none';
-        });
+        let element = this.element;
+
+        function hide(event) {
+            element.style.display = 'none';
+            event.target.removeEventListener('click', hide);
+        }
+
+        window.addEventListener('click', hide);
     };
 
     if (window.LightCM !== undefined) {
