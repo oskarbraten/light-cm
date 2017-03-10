@@ -83,7 +83,7 @@
                     if (isFunction(attributeValue)) {
                         attributeValue = attributeValue();
                     }
-                    item.element.setAttribute(attribute, render(attributeValue));
+                    item.element.setAttribute(attribute, render(attributeValue, data));
                 }
 
                 if (item.handler) {
