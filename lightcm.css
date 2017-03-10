@@ -1,0 +1,32 @@
+/*!
+ * lightcm
+ * https://github.com/oskarbraten/lightcm
+ */
+
+
+.context-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    display: none;
+    flex-direction: column;
+
+    min-width: 14rem;
+    background: #fff;
+    color: #666;
+    font-weight: 300;
+    box-shadow: 0 0 3px 0 #ddd;
+
+    z-index: 999;
+}
+.context-menu > .btn {
+    padding: 0.5rem 2rem;
+
+    cursor: pointer;
+    color: inherit;
+}
+.context-menu > .btn:hover {
+    background: #f7f7f7;
+    color: #444;
+}
