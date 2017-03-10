@@ -37,7 +37,7 @@ An item can have 3 properties:
  * `attributes` : \<Object\>
  * [`handler`](#handlerdata-event-clickevent) : \<Function\>
 
-`attributes` can contain any valid anchor-tag attribute (href, target, style, id, class etc..). And can be defined using a `String` or `Function` => `String`.
+The `attributes` parameter is a single-depth object.  The object can contain any string, or function that returns a string. The key value pair is then applied as an attribute to the item.
 
 #### Example:
 ```javascript
@@ -59,6 +59,14 @@ let items = [
 
 LightCM.init(items);
 ```
+Resulting contextmenu code:
+```html
+<div class="context-menu" id="context-menu">
+    <a class="btn" href="{{url}}" target="_blank">Button1</a>
+    <a class="btn">Button2</a>
+</div>
+```
+
 
 
 ### LightCM.open(event, data)
@@ -89,11 +97,12 @@ LightCM.open(event, { url: '/hello' });
  * `event` : \<[ContextMenuEvent](https://developer.mozilla.org/en-US/docs/Web/Events/contextmenu)\>
  * `clickEvent` : \<[ClickEvent](https://developer.mozilla.org/en/docs/Web/Events/click)\>
 
-`event` is the event fired by the opening of a contextmenu & `clickEvent` is the event fired when a button in the contextmenu is clicked.
+`event` is the contextmenu event.
+`clickEvent` is the event from when you click a button in the contextmenu.
 
 
 ### data
-The `data` parameter is a single-depth object. The `data` object can contain any string or function that returns a string. These strings are then rendered to the items.
+The `data` parameter is a single-depth object. The `data` object can contain any string, or function that returns a string. These strings are then rendered in the context menu.
 
 #### Example
 ```js
