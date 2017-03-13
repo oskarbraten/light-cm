@@ -1,2 +1,2 @@
-test/bulma.css linguist-vendored=false
-test/*.html linguist-vendored=false
+bulma.css linguist-vendored=false
+*.html linguist-vendored=false
