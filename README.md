@@ -11,11 +11,13 @@ $ npm install lightcm
 
 or
 
-[Download here](https://github.com/oskarbraten/lightcm/releases/download/1.0.1/dist.zip)
+[Download here](https://github.com/oskarbraten/lightcm/releases/download/2.0.0/lightcm.zip)
 
 ## Quick Start
 ```javascript
-LightCM.init([
+LightCM.init();
+
+LightCM.create('mymenu', [
     {
         label: 'Open',
         attributes: {
@@ -34,14 +36,24 @@ LightCM.init([
 ```
 
 ```html
-<div class="btn" onclick="LightCM.open(event, { url: '/hello' })"></div>
+<div class="btn" data-contextmenu="mymenu" data-contextmenu-data='{ "url": "/hello "}'></div>
+
+OR
+
+<div class="btn" onclick="LightCM.open('mymenu', event, { url: '/hello' })"></div>
 ```
 
 ## Documentation
 
+### LightCM.init(enableDataAttributes = true)
+Initializes LightCM.
 
-### LightCM.init(items)
+ * `enableDataAttributes` : \<Boolean\>
+Whether or not LightCM should detect data-contextmenu attributes and add an eventlistener 
+
+### LightCM.create(id, items)
 #### Parameters:
+ * `id` : \<String\>
  * `items` : \<Array\>
 
 An item can have 3 properties:
@@ -69,11 +81,11 @@ let items = [
     }
 ];
 
-LightCM.init(items);
+LightCM.create('mymenu', event, items);
 ```
 Resulting contextmenu code:
 ```html
-<div class="context-menu" id="context-menu">
+<div class="context-menu" id="mymenu">
     <a class="btn" href="{{url}}" target="_blank">Button1</a>
     <a class="btn">Button2</a>
 </div>
@@ -81,12 +93,13 @@ Resulting contextmenu code:
 
 
 
-### LightCM.open(event, data)
+### LightCM.open(id, event, data)
 #### Parameters:
+ * `id` : \<String\>
  * `event` : \<[ContextMenuEvent](https://developer.mozilla.org/en-US/docs/Web/Events/contextmenu)\>
  * `data` : \<Object\>
 
-
+Opens the contextmenu corresponding to the id.
 
 #### Example:
 ```javascript
@@ -99,7 +112,7 @@ let items = [
     }
 ];
 
-LightCM.open(event, { url: '/hello' });
+LightCM.open('mymenu', event, { url: '/hello' });
 ```
 
 
