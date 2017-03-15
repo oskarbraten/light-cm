@@ -33,8 +33,11 @@
                                 A lightweight contextmenu for the modern web.
                             </h2>
                             <p class="has-text-centered">
-                                <a class="button is-large" style="transition: transform 500ms ease" oncontextmenu="LightCM.open(event, {})">
+                                <a class="button is-large" style="transition: transform 500ms ease" data-contextmenu="test1">
                                     Right-click me.
+                                </a>
+                                <a class="button is-large" style="transition: transform 500ms ease" data-contextmenu="test2">
+                                    Or me.
                                 </a>
                             </p>
                         </div>
@@ -67,15 +70,10 @@
         <!-- JS -->
         <script src="./lightcm.js"></script>
         <script>
-            LightCM.init([
+            LightCM.init();
+            LightCM.create('test1', [
                 {
-                    label: 'Get started',
-                    attributes: {
-                        href: 'https://github.com/oskarbraten/lightcm'
-                    }
-                },
-                {
-                    label: 'Make me spin!',
+                    label: 'Spin',
                     handler: function (data, { target }) {
                         if (target.style.transform === 'rotate(360deg)') {
                             target.style.transform = 'rotate(0deg)';
@@ -83,8 +81,29 @@
                             target.style.transform = 'rotate(360deg)';
                         }
                     }
+                },
+                {
+                    label: 'Get started',
+                    attributes: {
+                        href: 'https://github.com/oskarbraten/lightcm'
+                    }
                 }
             ]);
+            LightCM.create('test2', [
+                {
+                    label: 'Give me a color',
+                    handler: function (data, { target }) {
+                        target.style.background = '#'+Math.floor(Math.random()*16777215).toString(16);
+                    }
+                },
+                {
+                    label: 'Get started',
+                    attributes: {
+                        href: 'https://github.com/oskarbraten/lightcm'
+                    }
+                }
+            ]);
+        </script>
         </script>
     </body>
 </html>

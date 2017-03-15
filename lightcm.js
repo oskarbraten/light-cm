@@ -8,6 +8,8 @@
 
     'use strict';
 
+
+    /* UTILITY */
     function isFunction (object) {
         return typeof object === 'function';
     }
@@ -20,61 +22,53 @@
             }
             return typeof r === 'string' || typeof r === 'number' ? r : a;
         });
-    };
+    }
 
-    let LightCM = {
-        items: null,
-        element: null
-    };
 
-    LightCM.init = function (items) {
-        if (items === undefined) {
-            throw Error('Must provide an array of items as argument.');
-        }
-
-        this.items = items;
-
-        // remove old context menu element.
-        let _oldElement = document.getElementById('context-menu');
-        if (_oldElement) {
-            _oldElement.remove();
-        }
-
-        let element = document.createElement('div');
-        element.classList.add('context-menu');
-        element.setAttribute('id', 'context-menu');
-
-        for (let item of this.items) {
-            let button = document.createElement('a');
-            button.classList.add('btn');
-            button.textContent = item.label;
-
-            for (let attribute in item.attributes) {
-                let attributeValue = item.attributes[attribute];
-                if (isFunction(attributeValue)) {
-                    attributeValue = attributeValue();
-                }
-                button.setAttribute(attribute, attributeValue);
+    /* CONTEXTMENU */
+    class ContextMenu {
+        constructor(id, items) {
+            if (id === undefined || items === undefined) {
+                throw Error('Unable to initalize, one or more invalid arguments!');
             }
 
-            item.element = button;
-            element.appendChild(button);
+            this.id = id;
+            this.items = items;
+
+            let element = document.createElement('div');
+            element.classList.add('context-menu');
+            element.setAttribute('id', this.id);
+
+            for (let item of this.items) {
+                let button = document.createElement('a');
+                button.classList.add('btn');
+                button.textContent = item.label;
+
+                for (let attribute in item.attributes) {
+                    let attributeValue = item.attributes[attribute];
+                    if (isFunction(attributeValue)) {
+                        attributeValue = attributeValue();
+                    }
+                    button.setAttribute(attribute, attributeValue);
+                }
+
+                item.element = button;
+                element.appendChild(button);
+            }
+
+            document.body.appendChild(element);
+
+            this.element = element;
         }
 
-        document.body.appendChild(element);
+        open(event, data) {
+            if (event === undefined || data === undefined) {
+                throw Error('Unable to open, one or more invalid arguments!');
+            }
 
-        this.element = element;
-    };
+            event.preventDefault();
 
-    LightCM.open = function (event, data) {
-        if (event === undefined) {
-            throw Error('Missing event argument. Unable to open menu.');
-        }
-
-        event.preventDefault();
-
-        // if user provided options, render options on elements.
-        if (data !== undefined) {
+            // if user provided options, render options on elements.
             for (let item of this.items) {
                 item.element.textContent = render(item.label, data);
 
@@ -92,20 +86,108 @@
                     }
                 }
             }
+
+            this.element.style.top = event.pageY + 'px';
+            this.element.style.left = event.pageX + 'px';
+            this.element.style.display = 'flex';
+
+
+            let hideOnClick = (event) => {
+                this.element.style.display = 'none';
+                window.removeEventListener('click', hideOnClick);
+            };
+            window.addEventListener('click', hideOnClick);
+
+            let hideOnContextmenu = (event) => {
+                if (event.target.dataset.contextmenu === undefined || event.target.dataset.contextmenu !== this.id) {
+                    this.element.style.display = 'none';
+                    window.removeEventListener('contextmenu', hideOnContextmenu);
+                }
+            };
+            window.addEventListener('contextmenu', hideOnContextmenu);
+        }
+    }
+
+
+    /* LIGHTCM */
+    let contextmenuList = [];
+
+    let LightCM = {};
+
+    let create = (id, items) => {
+        if (id === undefined) {
+            throw Error('Unable to initalize, the id argument is undefined!');
         }
 
-        this.element.style.top = event.pageY + 'px';
-        this.element.style.left = event.pageX + 'px';
-        this.element.style.display = 'flex';
+        let ocmIndex = contextmenuList.findIndex((cm) => {
+            return (cm.id === id);
+        });
 
-        let element = this.element;
+        let contextmenu;
+        if (ocmIndex > 0) {
+            // remove old context menu element.
+            let oldElement = document.getElementById(contextmenuList[ocmIndex].id);
+            if (oldElement) {
+                oldElement.remove();
+            }
 
-        function hide(event) {
-            element.style.display = 'none';
-            event.target.removeEventListener('click', hide);
+            contextmenu = new ContextMenu(id, items);
+            contextmenuList[ocmIndex] = contextmenu;
+        } else {
+            contextmenu = new ContextMenu(id, items);
+            contextmenuList.push(contextmenu);
         }
 
-        window.addEventListener('click', hide);
+        return contextmenu;
+    };
+
+    let open = (id, event, data = {}) => {
+        let contextMenu = contextmenuList.find((cm) => {
+            return (cm.id === id);
+        });
+
+        if (contextMenu !== undefined) {
+            contextMenu.open(event, data);
+        }
+    };
+
+    LightCM.init = (enableDataAttributes = true) => {
+        if (enableDataAttributes) {
+            LightCM._attributeListening.addContextmenuListeners();
+            LightCM._attributeListening.observer.observe(document.body, { childList: true, subtree: true });
+        }
+
+        LightCM.create = create;
+        LightCM.open = open;
+    }
+
+    LightCM._attributeListening = {
+        addContextmenuListeners: () => {
+            let elements = document.querySelectorAll('[data-contextmenu]');
+            for (let element of elements) {
+                // adding named function as handler to avoid duplicates.
+                function handler(event) {
+                    let jsonData = element.dataset.contextmenuData;
+                    let data;
+
+                    if (jsonData !== undefined) {
+                        data = JSON.parse(element.dataset.contextmenuData);
+                    }
+
+                    LightCM.open(element.dataset.contextmenu, event, data);
+                }
+                element.addEventListener('contextmenu', handler);
+            }
+        },
+        observer: new MutationObserver(function(mutations) {
+            for (let mutation of mutations) {
+                for (let node of mutation.addedNodes) {
+                    if (node.dataset && node.dataset.contextmenu) {
+                        LightCM._attributeListening.addContextmenuListeners(); // update data handlers
+                    }
+                }
+            }
+        })
     };
 
     if (window.LightCM !== undefined) {
