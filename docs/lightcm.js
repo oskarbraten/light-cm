@@ -98,8 +98,9 @@
             };
             window.addEventListener('click', hideOnClick);
 
+            let target = event.target;
             let hideOnContextmenu = (event) => {
-                if (event.target.dataset.contextmenu === undefined || event.target.dataset.contextmenu !== this.id) {
+                if (event.target !== target) {
                     this.element.style.display = 'none';
                     window.removeEventListener('contextmenu', hideOnContextmenu);
                 }
