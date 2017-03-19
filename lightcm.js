@@ -33,6 +33,7 @@
             }
 
             this.id = id;
+            this.visibility = false;
             this.items = items;
 
             let element = document.createElement('div');
@@ -59,6 +60,16 @@
             document.body.appendChild(element);
 
             this.element = element;
+        }
+
+        show() {
+            this.visibility = true;
+            this.element.style.display = 'flex';
+        }
+
+        hide() {
+            this.visibility = false;
+            this.element.style.display = 'none';
         }
 
         open(event, data) {
@@ -89,23 +100,22 @@
 
             this.element.style.top = event.pageY + 'px';
             this.element.style.left = event.pageX + 'px';
-            this.element.style.display = 'flex';
+            this.show();
 
 
             let hideOnClick = (event) => {
-                this.element.style.display = 'none';
+                this.hide();
                 window.removeEventListener('click', hideOnClick);
             };
             window.addEventListener('click', hideOnClick);
 
             let target = event.target;
-            let hideOnContextmenu = (event) => {
+
+            window.oncontextmenu = (event) => {
                 if (event.target !== target) {
-                    this.element.style.display = 'none';
-                    window.removeEventListener('contextmenu', hideOnContextmenu);
+                    this.hide();
                 }
             };
-            window.addEventListener('contextmenu', hideOnContextmenu);
         }
     }
 
@@ -148,6 +158,13 @@
         });
 
         if (contextMenu !== undefined) {
+            // hide any open menus.
+            for (let cm of contextmenuList) {
+                if (cm.visibility) {
+                    cm.hide();
+                }
+            }
+
             contextMenu.open(event, data);
         }
     };
